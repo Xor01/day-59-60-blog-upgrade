@@ -8,14 +8,25 @@ app = Flask(__name__)
 @app.route('/')
 @app.route('/index.html')
 def home():
-    return render_template('index.html')
+    blog_posts = get(url=getenv('POSTS_API')).json()
+    return render_template('index.html', posts=blog_posts)
 
 
 @app.route('/post.html')
-def post():
-
+def show_all_posts():
     blog_posts = get(url=getenv('POSTS_API')).json()
     return render_template('post.html', posts=blog_posts)
+
+
+@app.route('/post.html/<int:post_id>')
+def show_one_post(post_id):
+    blog_posts = get(url=getenv('POSTS_API')).json()
+    requested_post = None
+    for post in blog_posts:
+        if post['id'] == post_id:
+            requested_post = post
+            break
+    return render_template('post.html', post=requested_post)
 
 
 @app.route('/about.html')
